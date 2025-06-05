@@ -14,7 +14,7 @@ let whatsappi = require('./logic/whatsappi');
 let wapi = new whatsappi(singleConfig.n8nconfig);
 
 // Endpoint to handle incoming messages
-app.get('/bulksend', (req, res) => {
+app.post('/bulksend', (req, res) => {
     const business = "Jorge Arturo Meza"; // Default value if not provided
     const message = `Buen dia, tengo el gusto con el titular de la cuenta AT&T empresarial a nombre de *${business}* ? Si este tema no lo veo con usted, ayúdenme a dirigirme con la persona indicada o  respóndame este mensaje para no molestarle mas.`;
     const number = '+5215538864689';
