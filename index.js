@@ -14,12 +14,19 @@ app.listen(process.env.CLIENT_PORT, () => {
 
 let config = require('./config/config');
 let singleConfig = new config(process.env.N8N_HOST, process.env.N8N_PORT);
+let mailConfig = {
+    host:process.env.MAIL_HOST,
+    port:parseInt(process.env.MAIL_PORT),
+    user:process.env.MAIL_AUTH_USER,
+    pass:process.env.MAIL_AUTH_PASS
+}
+
 // Importing the WhatsApp API logic
 let whatsappi = require('./logic/whatsappi');
 let wapi = new whatsappi(singleConfig.n8nconfig);
 // Importing the MailAPI logic
 let mailapi = require('./logic/mailapi');
-let mail = new mailapi();
+let mail = new mailapi(mailConfig);
 
 // Endpoint to handle incoming messages
 app.post('/bulksend', (req, res) => {
@@ -50,7 +57,6 @@ app.post('/bulksend', (req, res) => {
         return;   
     } 
 });
-
 
 // Endpoint to handle mail sending
 app.post('/sendmail', (req, res) => {
@@ -87,5 +93,14 @@ app.post('/sendmail', (req, res) => {
 app.get('/sendmail/track/open',(req,res)=>{
     const id = req.query.id;
     console.log('tracking...')
-    mail.notifyEmailOpened(id);
+
+    try{
+        (async()=>{
+            let image = await mail.notifyEmailOpened(id);
+            res.setHeader('Content-Type','text/plain');
+            res.send('data:image/png;base64'+image);
+        })();
+    } catch(e){
+        res.send('Error')
+    } 
 })

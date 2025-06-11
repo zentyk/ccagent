@@ -1,14 +1,14 @@
 const nodemailer = require('nodemailer');
 
 class MailApi {
-    constructor(){
+    constructor(config){ 
         this.transporter = nodemailer.createTransport({
-            host: 'smtp.ionos.mx',
-            port: 465,
+            host: config.host,
+            port: config.port,
             secure: true, 
             auth: {
-                user:'armeza@todoencontrol.mx',
-                pass: 'zentik1$1000.exp1'
+                user: config.user,
+                pass: config.pass 
             }
         });
     }
@@ -29,7 +29,9 @@ class MailApi {
     }    
 
     async notifyEmailOpened(id){
-        console.log(`Correo abierto. Id:${id}`)
+        console.log(`Correo abierto. Id:${id}`); 
+        let img = "3312";
+        return img;
     }
 }
 
