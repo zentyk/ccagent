@@ -24,8 +24,7 @@ class whatsappi {
             console.log('Client authenticated!');
         });
 
-        this.client.on('message', (message) => {
-            console.log('Message received:', message);
+        this.client.on('message', (message) => { 
             this.receiveMessage(message);
         });
 
@@ -37,13 +36,14 @@ class whatsappi {
             console.log('Client was logged out', reason);
             this.client.destroy(); // Destroy the client instance
             this.client.initialize(); // Reinitialize the client
-        }); 
+        });
 
         this.client.initialize();
     }
 
     sendMessage(number, message) { 
-        const chatId = number.substring(1) + '@c.us'; 
+        let n = "+521"+ number; // Ensure the number is in the correct format
+        const chatId = n.substring(1) + '@c.us'; 
         this.client.sendMessage(chatId, message).then(response => {
             console.log('Message sent successfully:');
         })
@@ -53,7 +53,7 @@ class whatsappi {
     }
 
     async receiveMessage(message){ 
-        const url = `${this.n8nconfig.url}/webhook/request`;
+        const url = `${this.n8nconfig.url}/webhook-test/conversation/qualify`;
 
        //check if message is from an existing chat
         if (message.from === 'status@broadcast') {
@@ -61,12 +61,15 @@ class whatsappi {
             return;
         }
          
-        try {
+        try { 
             const response = await fetch(url, {
-                method: 'GET',
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
-                } 
+                }, 
+                body:{
+                    "message": message.body,
+                }
             });
 
             if (!response.ok) {
