@@ -1,16 +1,14 @@
 const {Client, LocalAuth} = require('whatsapp-web.js');
 
 class whatsappi {
-    constructor(n8nconfig) {
+    constructor() {
         this.client = new Client({
             authStrategy: new LocalAuth(),
             puppeteer: {
                 headless: true,
                 args: ['--no-sandbox', '--disable-setuid-sandbox']
             }
-        });
-
-        this.n8nconfig = n8nconfig;
+        }); 
 
         this.client.on('ready', () => { 
             console.log('Client is ready!'); 
@@ -24,9 +22,9 @@ class whatsappi {
             console.log('Client authenticated!');
         });
 
-        this.client.on('message', (message) => { 
+        /*this.client.on('message', (message) => { 
             this.receiveMessage(message);
-        });
+        });*/
 
         this.client.on('auth_failure', msg => {
             console.error('Authentication failed:', msg);
@@ -50,44 +48,7 @@ class whatsappi {
         .catch(err => {
             console.error('Error sending message:');
         });       
-    }
-
-    async receiveMessage(message){ 
-        const url = `${this.n8nconfig.url}/webhook-test/conversation/qualify`;
-
-       //check if message is from an existing chat
-        if (message.from === 'status@broadcast') {
-            console.log('Message is a broadcast status, ignoring.');
-            return;
-        }
-         
-        try { 
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }, 
-                body:{
-                    "message": message.body,
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-
-            const data = await response.json(); 
-
-            let tempclient = this.client; 
-
-            setTimeout(function () {
-                tempclient.sendMessage(message.from, `${data.message}`);
-            }, 15000); 
-
-        } catch (error) {
-            console.error('Error sending message to webhook:', error);
-        }
-    }
+    } 
 }
 
 module.exports = whatsappi;
